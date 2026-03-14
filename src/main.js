@@ -6,7 +6,15 @@ import router from './router/index.js';
 import axios from 'axios';
 
 // 1. Set Base URL Laravel agar lebih singkat saat dipanggil di Vue
-axios.defaults.baseURL = import.meta.env.VITE_API_LARAVEL_URL.replace(/\/$/, '');
+const apiUrl = window.APP_CONFIG?.API_URL;
+
+axios.defaults.baseURL = apiUrl;
+
+// Tambahkan ini untuk memastikan semua request lewat satu pintu
+axios.interceptors.request.use((config) => {
+  config.baseURL = window.APP_CONFIG?.API_URL || apiUrl;
+  return config;
+});
 
 // 2. Pasang AXIOS INTERCEPTOR (Satpam Otomatis)
 axios.interceptors.request.use(

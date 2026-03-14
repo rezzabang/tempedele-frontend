@@ -57,7 +57,7 @@ const handleLogin = async () => {
 
 <template>
   <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5;">
-    <a-card title="Login Sistem" style="width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <a-card title="Login" :headStyle="{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold' }" style="width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
       <a-form layout="vertical" :model="formState" @finish="handleLogin">
         <a-form-item label="Username" name="username" :rules="[{ required: true, message: 'Wajib diisi!' }]">
           <a-input v-model:value="formState.username" size="large" />
@@ -72,10 +72,7 @@ const handleLogin = async () => {
         </a-form-item>
 
         <a-button type="primary" html-type="submit" block size="large" :loading="isLoading">Login</a-button>
-        
-        <div style="text-align: center; margin-top: 15px;">
-          Belum punya akun? <a @click="router.push('/register')">Register di sini</a>
-        </div>
+
       </a-form>
     </a-card>
   </div>

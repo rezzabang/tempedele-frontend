@@ -61,21 +61,22 @@ const fetchRiwayatDetail = async () => {
     formState.sctid = (data.sctid === 'null' || !data.sctid) ? '-' : data.sctid;
     
 // Proses Array Gambar
-    if (data.images && data.images.length > 0) {
-      // 1. Ambil URL (Contoh: http://127.0.0.1:8000/api)
-      let backendUrl = import.meta.env.VITE_API_LARAVEL_URL.replace(/\/$/, '');
-      
-      // 2. Hapus kata '/api' agar menjadi Base URL asli (http://127.0.0.1:8000)
-      backendUrl = backendUrl.replace('/api', ''); 
-      
-      existingImages.value = data.images.map(img => ({
-        id: img.id,
-        // 3. Rangkai URL gambar yang benar
-        url: `${backendUrl}/storage/post-img/${img.image}`
-      }));
-    } else {
-      existingImages.value = [];
-    }
+if (data.images && data.images.length > 0) {
+  // Ambil dari window.APP_CONFIG, jika tidak ada fallback ke string kosong
+  let backendUrl = window.APP_CONFIG?.API_URL || "";
+  
+  if (backendUrl) {
+    // Hapus slash di akhir dan hapus /api agar dapat base URL-nya
+    backendUrl = backendUrl.replace(/\/$/, '').replace('/api', ''); 
+    
+    existingImages.value = data.images.map(img => ({
+      id: img.id,
+      url: `${backendUrl}/storage/post-img/${img.image}`
+    }));
+  }
+} else {
+  existingImages.value = [];
+}
 
   } catch (error) {
     message.error('Gagal mengambil detail dokumen.');

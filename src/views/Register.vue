@@ -24,7 +24,7 @@ const validatePass2 = async (_rule, value) => {
 const handleRegister = async () => {
   isLoading.value = true;
   try {
-    const apiLaravelUrl = import.meta.env.VITE_API_LARAVEL_URL.replace(/\/$/, '');
+    const apiLaravelUrl = (window.APP_CONFIG?.API_URL || "").replace(/\/$/, '');
     
     // Tembak API registerUser Anda
     const response = await axios.post(`${apiLaravelUrl}/register`, {

@@ -58,7 +58,9 @@ const fetchPatientData = async () => {
 
   try {
     // Ambil Token Eksternal API dari .env Vite Anda
-    const apiExternalToken = import.meta.env.VITE_API_TOKEN;
+const apiExternalToken = localStorage.getItem('external_api_token') || 
+                         window.APP_CONFIG?.EXTERNAL_TOKEN || 
+                         "";
 
     // URL lebih pendek & Token Laravel sudah disisipkan otomatis oleh main.js
     // Pastikan endpoint di Laravel Anda adalah GET /api/pasien/{noRm}
