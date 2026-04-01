@@ -32,10 +32,19 @@ const snomedOptions = ref([]);
 let snomedSearchTimeout = null;
 
 const visitOptions = computed(() => {
-  const reversedVisits = [...visitList.value].reverse();
-  return reversedVisits.map(visit => {
-    const formattedDate = visit.TanggalMasuk.replace(/-/g, '/');
-    return { value: visit.RegistrasiId, label: formattedDate, ruangan: visit.RuangDeskripsi };
+  if (!visitList.value.length) return [];
+  
+  // Gunakan slice() sebelum reverse agar tidak merusak array asli (walau spread sudah melakukannya)
+  return [...visitList.value].reverse().map(visit => {
+    // Ambil hanya 10 karakter pertama (YYYY-MM-DD) sebelum replace
+    const rawDate = visit.TanggalMasuk ? visit.TanggalMasuk.substring(0, 10) : '';
+    const formattedDate = rawDate.replace(/-/g, '/');
+    
+    return { 
+      value: visit.RegistrasiId, 
+      label: formattedDate || 'Tanpa Tanggal', 
+      ruangan: visit.RuangDeskripsi || 'Tanpa Ruangan' 
+    };
   });
 });
 
@@ -57,16 +66,9 @@ const fetchPatientData = async () => {
   Object.keys(fileList).forEach(key => fileList[key] = []);
 
   try {
-    // Ambil Token Eksternal API dari .env Vite Anda
-const apiExternalToken = localStorage.getItem('external_api_token') || 
-                         window.APP_CONFIG?.EXTERNAL_TOKEN || 
-                         "";
-
-    // URL lebih pendek & Token Laravel sudah disisipkan otomatis oleh main.js
-    // Pastikan endpoint di Laravel Anda adalah GET /api/pasien/{noRm}
-    const response = await axios.get(`/pasien/${formState.noRm}`, {
-      headers: { 'X-External-Token': apiExternalToken }
-    });
+    // PANGGILAN API JADI SANGAT SEDERHANA
+    // Tidak perlu header X-External-Token lagi
+    const response = await axios.get(`/pasien/${formState.noRm}`);
 
     if (response.data.statusCode === 200 && response.data.result.length > 0) {
       visitList.value = response.data.result;
@@ -77,7 +79,7 @@ const apiExternalToken = localStorage.getItem('external_api_token') ||
     }
   } catch (error) {
     console.error(error);
-    message.error('Gagal menghubungi API eksternal.');
+    message.error('Gagal mengambil data dari server Backend.');
   } finally {
     isLoading.value = false;
   }
@@ -225,10 +227,13 @@ const saveToLaravel = async () => {
             placeholder="-- Pilih Tanggal Kunjungan --"
             :options="visitOptions"
             :disabled="visitList.length === 0"
+            :virtual="false"
             @change="handleVisitChange"
           >
-            <template #option="{ label, ruangan }">
-              <span style="font-weight: bold;">{{ label }}</span> - {{ ruangan }}
+            <template #option="{ value, label, ruangan }">
+              <div :key="value">
+                <span style="font-weight: bold;">{{ label }}</span> - {{ ruangan }}
+              </div>
             </template>
           </a-select>
         </a-form-item>
